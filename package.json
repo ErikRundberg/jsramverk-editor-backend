@@ -1,0 +1,16 @@
+{
+  "name": "test-editor-backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^16.0.2",
+    "express": "~4.16.1",
+    "mongodb": "^4.9.1",
+    "morgan": "~1.9.1"
+  }
+}
