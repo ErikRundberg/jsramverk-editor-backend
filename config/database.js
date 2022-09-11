@@ -6,8 +6,8 @@ const database = {
     getDb: async function getDb() {
         let uri = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.wqwu4vl.mongodb.net/?retryWrites=true&w=majority`;
 
-    if (process.env.NODE_ENV === 'test') {
-        uri = "mongodb://localhost:27017/test";
+    if (process.env.NODE_ENV === 'local') {
+        uri = "mongodb://localhost:27017/local";
     }
 
     const client = await mongo.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });

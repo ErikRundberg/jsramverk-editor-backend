@@ -17,7 +17,7 @@ app.options('*', cors());
 app.disable('x-powered-by');
 
 // Skip log if test environment
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "local") {
   app.use(logger("combined")); // Combined = Apache style LOGs
 }
 
