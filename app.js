@@ -33,7 +33,7 @@ app.use(middleware.errorHandler);
 
 
 app.listen(port, () => {
-  console.log('la empresa api listening on port ' + port);
+  console.log('jsramverk editor api listening on port ' + port);
 });
 
 module.exports = app;
