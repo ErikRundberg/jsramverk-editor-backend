@@ -5,7 +5,13 @@ process.env.NODE_ENV = 'local';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../app.js');
-const db = require("../config/database");
+const database = require("../config/database");
+
+const testDocument = {
+    _id: "5ce819935e539c343f141ece",
+    title: "Test document",
+    content: "Test content"
+}
 
 chai.should();
 chai.use(chaiHttp);
@@ -26,9 +32,27 @@ describe("endpoints", () => {
     })
 })
 describe("documents", () => {
-    before(async () => {
-        const database = await db.getDb();
-        database.db.dropCollection("docs");
+    before(() => {
+        return new Promise(async (resolve) => {
+            const db = await database.getDb();
+
+            db.db.listCollections(
+                { name: "local" }
+            )
+                .next()
+                .then(async function (info) {
+                    if (info) {
+                        await db.collection.drop();
+                    }
+                })
+                .catch(function (err) {
+                    console.error(err);
+                })
+                .finally(async function () {
+                    await db.client.close();
+                    resolve();
+                });
+        });
     });
 
     it('[GET] "/docs" - get empty documents', (done) => {
@@ -46,23 +70,19 @@ describe("documents", () => {
     });
 
     it('[POST] "/docs" - create document', (done) => {
-        const document = {
-            _id: "5ce819935e539c343f141ece",
-            title: "Test document",
-            content: "Test content"
-        }
         chai.request(server)
             .post("/docs")
-            .set('content-type', 'application/x-www-form-urlencoded')
-            .send(document)
+            .send(testDocument)
             .end((err, res) => {
                 res.should.have.status(201);
                 res.body.status.should.be.equal(201);
                 res.body.should.be.an("object")
-                res.body.data._id.should.be.equal(document._id);
-                res.body.data.title.should.be.equal(document.title);
-                res.body.data.title.should.be.equal(document.title);
-                res.body.data.content.should.be.equal(document.content);
+                res.body.data._id.should.be.equal(testDocument._id);
+                res.body.data.title.should.be.equal(testDocument.title);
+                res.body.data.title.should.be.equal(testDocument.title);
+                res.body.data.content.should.be.equal(testDocument.content);
+
+                console.log(res);
 
                 done();
             });
