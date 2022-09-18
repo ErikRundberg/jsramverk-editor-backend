@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./app.js",
-    "test": "nyc --reporter=html --reporter=text mocha 'tests/**/*.js'"
+    "test": "nyc --reporter=html --reporter=text --reporter=clover mocha --timeout 10000"
   },
   "dependencies": {
     "cors": "^2.8.5",
