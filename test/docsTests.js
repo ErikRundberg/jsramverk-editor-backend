@@ -82,23 +82,7 @@ describe("documents", () => {
                 res.body.data.title.should.be.equal(testDocument.title);
                 res.body.data.content.should.be.equal(testDocument.content);
 
-                console.log(res);
-
                 done();
             });
-    });
-
-    it('[GET] "/docs" - populated documents', (done) => {
-        chai.request(server)
-            .get("/docs")
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.status.should.be.equal(200);
-                res.body.should.be.an("object");
-                res.body.data.should.be.an("array");
-                res.body.data.length.should.be.equal(1);
-
-                done();
-            })
     });
 });
