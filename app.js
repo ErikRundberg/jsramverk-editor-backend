@@ -10,6 +10,7 @@ const middleware = require("./config/middleware");
 
 const app = express();
 const port = process.env.PORT || 1338;
+const httpServer = require("http").createServer(app);
 
 app.use(cors());
 app.options('*', cors());
@@ -32,8 +33,21 @@ app.use(middleware.missingPath);
 app.use(middleware.errorHandler);
 
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log('jsramverk editor api listening on port ' + port);
 });
+
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+io.sockets.on("connection", function(socket) {
+  socket.on("create", function(room) {
+    // ??? ;)
+  })
+})
 
 module.exports = app;
