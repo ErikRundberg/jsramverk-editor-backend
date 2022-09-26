@@ -1,12 +1,15 @@
 require('dotenv').config()
 
 const express = require('express');
+const { Server } = require("socket.io");
 const logger = require('morgan');
 const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const docsRouter = require('./routes/docs');
 const middleware = require("./config/middleware");
+
+const documentFacade = require("./models/documentFacade");
 
 const app = express();
 const port = process.env.PORT || 1338;
@@ -37,16 +40,28 @@ httpServer.listen(port, () => {
   console.log('jsramverk editor api listening on port ' + port);
 });
 
-const io = require("socket.io")(httpServer, {
+const io = new Server(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
   }
 });
 
-io.sockets.on("connection", function(socket) {
-  socket.on("create", function(room) {
-    // ??? ;)
+let throttleTimer;
+io.sockets.on("connection", (socket) => {
+  socket.on("create", (room) => {
+    socket.join(room);
+  });
+
+  socket.on("doc", (data) => {
+    socket.broadcast.to(data._id).emit("update", data);
+    clearTimeout(throttleTimer);
+    throttleTimer = setTimeout(async () => {
+      if (data._id) {
+        console.log("Saving to database");
+        await documentFacade.saveDoc(data);
+      }
+    }, 2000);
   })
 })
 
