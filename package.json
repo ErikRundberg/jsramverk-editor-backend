@@ -1,6 +1,6 @@
 {
   "name": "jsramverk-editor-backend",
-  "version": "4.0.0",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "start": "node ./app.js",
