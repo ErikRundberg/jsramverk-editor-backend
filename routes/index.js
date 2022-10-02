@@ -9,8 +9,8 @@ router.get('/', function(req, res) {
       endpoints: [
         {
           method: "GET",
-          url: "/docs",
-          description: "Get all documents"
+          url: "/docs/:email",
+          description: "Get all documents by email"
         },
         {
           method: "POST",
@@ -19,8 +19,18 @@ router.get('/', function(req, res) {
         },
         {
           method: "GET",
-          url: "/docs/:id",
+          url: "/docs/id/:id",
           description: "Get a specific document"
+        },
+        {
+          method: "POST",
+          url: "/user/register",
+          description: "Register a user"
+        },
+        {
+          method: "POST",
+          url: "/user/login",
+          description: "Login a user"
         }
       ]
     }

@@ -6,21 +6,23 @@ let database;
 const documentFacade = {
     saveDoc: async function saveDocument(doc) {
         try {
-            database = await dbConfig.getDb();
+            database = await dbConfig.getDb("docs");
             if (doc._id) {
                 if (doc._id !== ObjectId.type) {
                     doc._id = ObjectId(doc._id);
                 }
                 await database.collection.updateOne({ _id: doc._id }, { $set: {
                     title: doc.title,
-                    content: doc.content
+                    content: doc.content,
                 }});
                 return doc;
             }
-            const result = await database.collection.insertOne(doc);
+            const result = await database.collection.insertOne({...doc, allowedUsers: [doc.allowedUsers]});
+
             return {
                 _id: result.insertedId,
-                ...doc
+                ...doc,
+                allowedUsers: doc.allowedUsers
             };
         }
         catch (e) {
@@ -39,7 +41,7 @@ const documentFacade = {
     },
     openDoc: async function openDocument(id) {
         try {
-            database = await dbConfig.getDb();
+            database = await dbConfig.getDb("docs");
             if (id !== ObjectId.type) {
                 id = ObjectId(id);
             }
@@ -55,24 +57,46 @@ const documentFacade = {
                 errors: {
                     title: "Database error",
                     detail: e.message,
-                    source: `/docs/${id}`
+                    source: `/docs/id/${id}`
                 }
             };
         } finally {
             await database.client.close();
         }
     },
-    getDocs: async function getDocs() {
+    getDocs: async function getDocs(email) {
         try {
-            database = await dbConfig.getDb();
-            return await database.collection.find().toArray();
+            database = await dbConfig.getDb("docs");
+            return await database.collection.find({ $or:
+                    [{ allowedUsers: "*" }, { allowedUsers: email } ]}).toArray();
         } catch (e) {
             return {
                 status: 500,
                 errors: {
                     title: "Database error",
                     detail: e.message,
-                    source: "/docs/all"
+                    source: "/docs/:email"
+                }
+            };
+        } finally {
+            await database.client.close();
+        }
+    },
+    addUser: async function addUser(body) {
+        try {
+            database = await dbConfig.getDb("docs");
+
+            return await database.collection.updateOne(
+                { _id: ObjectId(body._id) },
+                { $push: { allowedUsers: body.email }}
+            );
+        } catch (e) {
+            return {
+                status: 500,
+                errors: {
+                    title: "Database error",
+                    detail: e.message,
+                    source: "/docs/add"
                 }
             };
         } finally {

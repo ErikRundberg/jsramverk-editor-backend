@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const docsRouter = require('./routes/docs');
+const authRouter = require('./routes/auth');
 const middleware = require("./config/middleware");
 
 const documentFacade = require("./models/documentFacade");
@@ -32,8 +33,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(middleware.logPath)
 app.use('/', indexRouter);
 app.use('/docs', docsRouter);
+app.use('/user', authRouter);
 app.use(middleware.missingPath);
 app.use(middleware.errorHandler);
+app.use(middleware.checkToken);
 
 
 httpServer.listen(port, () => {
