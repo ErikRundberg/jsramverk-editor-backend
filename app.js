@@ -8,6 +8,7 @@ const cors = require('cors');
 const indexRouter = require('./routes/index');
 const docsRouter = require('./routes/docs');
 const authRouter = require('./routes/auth');
+const emailRouter = require('./routes/email');
 const middleware = require("./config/middleware");
 
 const documentFacade = require("./models/documentFacade");
@@ -34,6 +35,7 @@ app.use(middleware.logPath)
 app.use('/', indexRouter);
 app.use('/docs', docsRouter);
 app.use('/user', authRouter);
+app.use('/email', emailRouter)
 app.use(middleware.missingPath);
 app.use(middleware.errorHandler);
 app.use(middleware.checkToken);
