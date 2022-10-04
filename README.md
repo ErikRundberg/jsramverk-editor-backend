@@ -58,6 +58,19 @@ To start the server: `npm start`
 
 ---
 
+# Mail service
+To enable the mail service a sendgrid api key is needed.
+
+[Sendgrid](https://sendgrid.com/) is a free mail service provider.
+
+Setup a web application and insert the API key in the .env file
+
+```
+SENDGRID_API_KEY='<YOUR_API_KEY>'
+```
+
+---
+
 # API Documentation
 
 ## Get all available endpoints
