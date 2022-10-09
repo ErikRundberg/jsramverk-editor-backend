@@ -35,23 +35,19 @@ module.exports = {
     checkToken: (req, res, next) => {
         const token = req.headers["x-access-token"];
 
-        if (token) {
-            jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
-                if (err) {
-                    return res.status(500).json({
-                        "errors": {
-                            source: req.path,
-                            title: "Failed authentication",
-                            detail: err.message
-                        }
-                    })
-
-                    req.user = {};
-                    req.user.email = decoded.email;
-
-                    return next();
+        if (!token) {
+            res.status(500).json({
+                "errors": {
+                    source: req.path,
+                    title: "Failed authentication",
+                    detail: "No x-access-token in header"
                 }
-            });
+            })
         }
+        jwt.verify(token, process.env.JWT_SECRET, function (err) {
+            if (!err) {
+                next();
+            }
+        });
     }
 }

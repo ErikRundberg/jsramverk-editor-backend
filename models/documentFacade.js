@@ -64,9 +64,12 @@ const documentFacade = {
             await database.client.close();
         }
     },
-    getDocs: async function getDocs(email) {
+    getDocs: async function getDocs(email=undefined) {
         try {
             database = await dbConfig.getDb("docs");
+            if (email === undefined) {
+                return await database.collection.find().toArray();
+            }
             return await database.collection.find({ $or:
                     [{ allowedUsers: "*" }, { allowedUsers: email } ]}).toArray();
         } catch (e) {

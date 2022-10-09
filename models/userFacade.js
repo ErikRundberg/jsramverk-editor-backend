@@ -50,7 +50,7 @@ const userFacade = {
             return {
                 _id: result.insertedId,
                 token: token,
-                ...body
+                email
             };
         } catch (e) {
             return errorMessage("Database error", e.message, path);
@@ -80,7 +80,7 @@ const userFacade = {
                 }
                 return {
                         token: token,
-                        ...body
+                        email
                     };
                 }
             return errorMessage("Login error", "Password is incorrect", path);
