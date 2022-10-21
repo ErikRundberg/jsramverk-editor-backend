@@ -21,8 +21,10 @@ const documentFacade = {
 
             return {
                 _id: result.insertedId,
-                ...doc,
-                allowedUsers: doc.allowedUsers
+                title: doc.title,
+                content: doc.content,
+                allowedUsers: [doc.allowedUsers],
+                editor: doc.editor
             };
         }
         catch (e) {
@@ -64,14 +66,17 @@ const documentFacade = {
             await database.client.close();
         }
     },
-    getDocs: async function getDocs(email=undefined) {
+    getDocs: async function getDocs(email=undefined, editor = undefined) {
         try {
             database = await dbConfig.getDb("docs");
             if (email === undefined) {
                 return await database.collection.find().toArray();
             }
-            return await database.collection.find({ $or:
-                    [{ allowedUsers: "*" }, { allowedUsers: email } ]}).toArray();
+            return await database.collection.find({
+                $and: [
+                    { editor: editor },
+                    { $or: [ { allowedUsers: "*" }, { allowedUsers: email } ]}
+                ]}).toArray();
         } catch (e) {
             return {
                 status: 500,

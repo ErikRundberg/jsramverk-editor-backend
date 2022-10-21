@@ -16,10 +16,11 @@ const RootQueryType = new GraphQLObjectType({
             type: new GraphQLList(DocumentType),
             description: "All documents accessible by email",
             args: {
-                email: { type: GraphQLString }
+                email: { type: GraphQLString },
+                editor: { type: GraphQLString }
             },
             resolve: async function(parent, args) {
-                return await document.getDocs(args.email);
+                return await document.getDocs(args.email, args.editor);
             }
         },
         document: {

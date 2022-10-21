@@ -73,7 +73,7 @@ io.sockets.on("connection", (socket) => {
   });
 
   socket.on("doc", (data) => {
-    socket.broadcast.to(data._id).emit("update", data);
+    socket.broadcast.to(data._id).emit("update", {content: data.content, title: data.title, typer: data.typer});
     clearTimeout(throttleTimer);
     throttleTimer = setTimeout(async () => {
       if (data._id) {
