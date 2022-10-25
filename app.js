@@ -1,7 +1,6 @@
 require('dotenv').config()
 
 const express = require('express');
-const { Server } = require("socket.io");
 const logger = require('morgan');
 const cors = require('cors');
 const { graphqlHTTP } = require('express-graphql');
@@ -25,6 +24,8 @@ const schema = new GraphQLSchema({
   query: RootQueryType
 });
 
+let throttleTimer;
+
 
 app.use(cors());
 app.options('*', cors());
@@ -32,7 +33,8 @@ app.options('*', cors());
 app.disable('x-powered-by');
 
 // Skip log if test environment
-if (process.env.NODE_ENV !== "local") {
+/* istanbul ignore next */
+if (process.env.NODE_ENV !== "test") {
   app.use(logger("combined")); // Combined = Apache style LOGs
 }
 
@@ -44,7 +46,9 @@ app.use(middleware.logPath)
 app.use('/', indexRouter);
 app.use('/user', authRouter);
 app.use('/email', emailRouter);
-app.use(middleware.checkToken);
+if (process.env.NODE_ENV !== "test") {
+  app.use(middleware.checkToken);
+}
 app.use('/docs', docsRouter);
 app.use('/graphql', middleware.checkToken);
 app.use('/graphql', graphqlHTTP({
@@ -55,18 +59,17 @@ app.use(middleware.missingPath);
 app.use(middleware.errorHandler);
 
 
-httpServer.listen(port, () => {
+const server = httpServer.listen(port, () => {
   console.log('jsramverk editor api listening on port ' + port);
 });
 
-const io = new Server(httpServer, {
+const io = require("socket.io")(httpServer, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "DELETE"]
   }
 });
 
-let throttleTimer;
 io.sockets.on("connection", (socket) => {
   socket.on("create", (room) => {
     socket.join(room);
@@ -84,4 +87,4 @@ io.sockets.on("connection", (socket) => {
   })
 })
 
-module.exports = app;
+module.exports = server;

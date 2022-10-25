@@ -1,12 +1,14 @@
 const { ObjectId } = require("mongodb");
 const dbConfig = require("../config/database");
 
+const collectionName = process.env.NODE_ENV === "test" ? "test" : "docs";
+console.log(collectionName);
 let database;
 
 const documentFacade = {
     saveDoc: async function saveDocument(doc) {
         try {
-            database = await dbConfig.getDb("docs");
+            database = await dbConfig.getDb(collectionName);
             if (doc._id) {
                 if (doc._id !== ObjectId.type) {
                     doc._id = ObjectId(doc._id);
@@ -17,13 +19,13 @@ const documentFacade = {
                 }});
                 return doc;
             }
-            const result = await database.collection.insertOne({...doc, allowedUsers: [doc.allowedUsers]});
+            const result = await database.collection.insertOne({...doc, allowedUsers: doc.allowedUsers});
 
             return {
                 _id: result.insertedId,
                 title: doc.title,
                 content: doc.content,
-                allowedUsers: [doc.allowedUsers],
+                allowedUsers: doc.allowedUsers,
                 editor: doc.editor
             };
         }
@@ -43,7 +45,7 @@ const documentFacade = {
     },
     openDoc: async function openDocument(id) {
         try {
-            database = await dbConfig.getDb("docs");
+            database = await dbConfig.getDb(collectionName);
             if (id !== ObjectId.type) {
                 id = ObjectId(id);
             }
@@ -68,7 +70,7 @@ const documentFacade = {
     },
     getDocs: async function getDocs(email=undefined, editor = undefined) {
         try {
-            database = await dbConfig.getDb("docs");
+            database = await dbConfig.getDb(collectionName);
             if (email === undefined) {
                 return await database.collection.find().toArray();
             }
@@ -92,7 +94,7 @@ const documentFacade = {
     },
     addUser: async function addUser(body) {
         try {
-            database = await dbConfig.getDb("docs");
+            database = await dbConfig.getDb(collectionName);
 
             return await database.collection.updateOne(
                 { _id: ObjectId(body._id) },
@@ -107,6 +109,24 @@ const documentFacade = {
                     source: "/docs/add"
                 }
             };
+        } finally {
+            await database.client.close();
+        }
+    },
+    deleteDoc: async function deleteDoc(body) {
+        try {
+            database = await dbConfig.getDb(collectionName);
+
+            return await database.collection.deleteOne({_id: ObjectId(body._id)});
+        } catch (e) {
+            return {
+                status: 500,
+                errors: {
+                    title: "Database error",
+                    detail: e.message,
+                    source: "/docs"
+                }
+            }
         } finally {
             await database.client.close();
         }

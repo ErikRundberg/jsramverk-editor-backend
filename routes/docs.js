@@ -16,6 +16,12 @@ router.post("/", async (req, res) => {
   res.status(201).json(responseBody(result, 201));
 });
 
+router.delete("/", async (req, res) => {
+  const result = await docFacade.deleteDoc(req.body);
+
+  res.json(responseBody(result));
+})
+
 router.get("/id/:id", async (req, res) => {
   const doc = await docFacade.openDoc(req.params.id);
 

@@ -1,12 +1,10 @@
-require('dotenv').config()
-
 const mongo = require('mongodb').MongoClient;
 
 const database = {
     getDb: async function getDb(collectionName) {
         let uri = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.wqwu4vl.mongodb.net/?retryWrites=true&w=majority`;
 
-    if (process.env.NODE_ENV === 'local') {
+    if (process.env.NODE_ENV === 'test') {
         uri = "mongodb://localhost:27017/local";
     }
 
